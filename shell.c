@@ -14,70 +14,10 @@ void print_error(void)
 }
 
 /**
- * execute_cmd - executes command parsed to the prompt
- *
- * @cmd: command to be executed
- * @argv: list of argument variables
- * @envp: list of environment variables
- */
-
-void execute_cmd(char *cmd, char **argv, char **envp)
-{
-	if (fork() == 0)
-	{
-		if (execve(cmd, argv, envp) == -1)
-		{
-			print_error();
-			free(cmd);
-			exit(EXIT_FAILURE);
-		}
-	}
-	else if (fork() > 0)
-		wait(NULL);
-}
-
-
-/**
- * get_input - gets input from user
- *
- * Return: user input
- */
-
-char *get_input(void)
-{
-	char *input;
-	size_t len = 0;
-	ssize_t result;
-
-	result = getline(&input, &len, stdin);
-	if (result == -1)
-	{
-		if (feof(stdin))
-			return (NULL);
-		free(input);
-		print_error();
-	}
-	input[strcspn(input, "\n")] = '\0';
-
-	return (input);
-}
-
-
-/**
- * print_prompt - prints the command prompt for the shell
- */
-
-void print_prompt(void)
-{
-	  write(STDOUT_FILENO, "#cisfun$ ", 10);
-}
-
-/**
  * main - gets input from user and executes the command
  *
  * @argc: arg count
  * @argv: array list of arg variables
- * @envp: list of environment variables
  *
  * Description: run an infinte loop for the custom shell's
  * command prompt. get input from user, strip off the new line character
@@ -85,21 +25,43 @@ void print_prompt(void)
  * if none, execute command otherwise wait for completion then execute command;
  * in case of error, print error statement.
  *
- * Return: int
+ * Return: success 0, failure -1
  */
 
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
-	char *line;
+	char *line = {NULL};
+	size_t linecap = 0;
+	size_t linelen;
+	pid_t pid;
 
 	while (1)
 	{
-		print_prompt();
-		line = get_input();
-		if (line == NULL)
-			break;
-		execute_cmd(line, argv, envp);
+		write(STDOUT_FILENO, "#cisfun$ ", 10);
+		linelen = getline(&line, &linecap, stdin);
+		if ((int)linelen == -1)
+		{
+			if (feof(stdin))
+				break;
+			print_error();
+		}
+		line[strcspn(line, "\n")] = '\0';
+	pid = fork();
+	if (pid == 0)
+	{
+		if (execve(line, argv, envp) == -1)
+		{
+			print_error();
+			free(line);
+			exit(EXIT_FAILURE);
+		}
+	}
+	else if (pid > 0)
+		waitpid(pid, NULL, 0);
+	else
+		print_error();
 	}
 
+	free(line);
 	return (0);
 }
