@@ -14,6 +14,42 @@ void print_error(void)
 }
 
 /**
+ * print_prompt - display's user command prompt
+ */
+
+void print_prompt(void)
+{
+	write(STDOUT_FILENO, "#cisfun$ ", 10);
+}
+
+/**
+ * handle_args - tokenizes command line arguments and
+ * sets them in argv
+ *
+ * @iptr: pointer to user input
+ * @argv: list of argument variables
+ *
+ * Return: int
+ */
+
+int handle_args(char **iptr, char **argv)
+{
+	char *token;
+	int i = 0;
+
+	token = strtok(*iptr, " ");
+	while (token != NULL)
+	{
+		argv[i] = token;
+		i++;
+		printf("%s\n", token);
+		token = strtok(NULL, " ");
+	}
+	argv[i] = NULL;
+	return (0);
+}
+
+/**
  * main - gets input from user and executes the command
  *
  * @argc: arg count
@@ -28,28 +64,30 @@ void print_error(void)
  * Return: success 0, failure -1
  */
 
-int main(__attribute__((unused))int argc, char *argv[], char *envp[])
+int main(__attribute__((unused))int argc, char *argv[], __attribute__((unused))char *envp[])
 {
 	char *line = {NULL};
-	size_t linecap = 0;
-	size_t linelen;
+	size_t size = 0;
+	ssize_t linelen;
 	pid_t pid;
+	int status;
 
 	while (1)
 	{
-		write(STDOUT_FILENO, "#cisfun$ ", 10);
-		linelen = getline(&line, &linecap, stdin);
-		if ((int)linelen == -1)
+		print_prompt();
+		linelen = getline(&line, &size, stdin);
+		if (linelen == -1)
 		{
 			if (feof(stdin))
 				break;
 			print_error();
 		}
-		line[strcspn(line, "\n")] = '\0';
+		line[strlen(line) - 1] = '\0';
 	pid = fork();
 	if (pid == 0)
 	{
-		if (execve(line, argv, envp) == -1)
+		handle_args(&line, argv);
+		if (execve(argv[0], argv, envp) == -1)
 		{
 			print_error();
 			free(line);
@@ -57,7 +95,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		}
 	}
 	else if (pid > 0)
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, 0);
 	else
 		print_error();
 	}
