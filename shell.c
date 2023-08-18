@@ -15,7 +15,7 @@ void print_error(void)
 
 void print_prompt(void)
 {
-	write(STDOUT_FILENO, "#cisfun$ ", 10);
+	write(STDOUT_FILENO, "#cisfun$ ", 9);
 }
 
 /**
@@ -34,6 +34,8 @@ int handle_args(char **iptr, char **argv)
 	int i = 0;
 
 	token = strtok(*iptr, " ");
+	if (token == NULL)
+		return (-1);
 	while (token != NULL)
 	{
 		argv[i] = token;
@@ -111,20 +113,20 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 				break;
 			print_error();
 		}
-		line[strlen(line) - 1] = '\0';
-		handle_args(&line, argv);
-		path = search_path(&head, argv[0]);
-
-		if ((execute_command(path, argv, envp)) == -1)
+		line[linelen - 1] = '\0';
+		if (handle_args(&line, argv) != -1)
 		{
-			print_error();
-			free(line);
-			exit(EXIT_FAILURE);
+			path = search_path(&head, argv[0]);
+
+			if ((execute_command(path, argv, envp)) == -1)
+			{
+				print_error();
+				free(line);
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
 
-	free(head);
-	free(path);
 	free(line);
 	return (0);
 }
