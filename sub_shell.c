@@ -31,10 +31,11 @@ path_llist *token_to_list(char **env)
 {
 	char *token;
 	path_llist *head;
+	int i = 0;
        
 	head = NULL;
-	token = strtok(env[20], "=");
-
+	token = strtok(env[16], "=");
+	
 	while (token != NULL)
 	{
 		token = strtok(NULL, ":");
