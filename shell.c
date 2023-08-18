@@ -105,7 +105,8 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 	head = token_to_list(envp);
 	while (1)
 	{
-		print_prompt();
+		if (isatty(STDIN_FILENO))
+			print_prompt();
 		linelen = getline(&line, &size, stdin);
 		if (linelen == -1)
 		{
