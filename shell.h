@@ -1,5 +1,5 @@
 #ifndef SHELL_H_
-#define _SHELL_H
+#define SHELL_H_
 
 #include <unistd.h>
 #include <stdio.h>
@@ -8,6 +8,14 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
+
+/**
+ * struct llist - linked list structure
+ *
+ * @dir: path to directory
+ * @next: llist structure
+ *
+ */
 
 typedef struct llist
 {

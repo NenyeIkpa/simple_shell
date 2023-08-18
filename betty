@@ -1,2 +1,2 @@
 #!/bin/bash
-betty *.c
+betty *.c *.h

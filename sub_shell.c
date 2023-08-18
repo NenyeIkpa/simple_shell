@@ -34,7 +34,6 @@ path_llist *token_to_list(char **env)
 	int i = 0;
        
 	head = NULL;
-
 	while (env[i] != NULL)
 	{
 		if (strncmp(env[i], "PATH", 4) == 0)

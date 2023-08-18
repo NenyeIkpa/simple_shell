@@ -97,7 +97,7 @@ int execute_command(char *command, char **argv, char **envp)
 
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
-	char *line = {NULL}, *path;
+	char *line = {NULL}, *path = NULL;
 	size_t size = 0;
 	ssize_t linelen;
 	path_llist *head;
@@ -114,10 +114,11 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			print_error();
 		}
 		line[linelen - 1] = '\0';
+		if (strcmp(line, "exit") == 0)
+			break;
 		if (handle_args(&line, argv) != -1)
 		{
 			path = search_path(&head, argv[0]);
-
 			if ((execute_command(path, argv, envp)) == -1)
 			{
 				print_error();
