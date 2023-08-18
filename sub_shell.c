@@ -31,9 +31,19 @@ path_llist *token_to_list(char **env)
 {
 	char *token;
 	path_llist *head;
+	int i = 0;
        
 	head = NULL;
-	token = strtok(env[20], "=");
+
+	while (env[i] != NULL)
+	{
+		if (strncmp(env[i], "PATH", 4) == 0)
+		{
+			token = strtok(env[i], "=");
+			break;
+		}
+		i++;
+	}
 
 	while (token != NULL)
 	{
