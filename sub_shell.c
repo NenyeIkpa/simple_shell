@@ -1,21 +1,20 @@
 #include "shell.h"
 
-path_llist *add_node(path_llist **head,  char *token)
+path_llist *add_node(path_llist **head,  const char *token)
 {
 	path_llist *node;
 	char *token_copy;
 
+	if (token == NULL)
+		return (NULL);
 	node  = malloc(sizeof(node));
 	if (node == NULL)
-	{
-		perror("node error");
 		return (NULL);
-	}
 	token_copy = strdup(token);
 	if (*head == NULL)
 	{
 		*head = node;
-		node->dir = token;
+		node->dir = token_copy;
 		node->next = NULL;
 	}
 	else
@@ -24,6 +23,7 @@ path_llist *add_node(path_llist **head,  char *token)
 		node->next = *head;
 		*head = node;
 	}
+
 	return (*head);
 }
 
@@ -34,14 +34,23 @@ path_llist *token_to_list(char **env)
 	int i = 0;
        
 	head = NULL;
-	token = strtok(env[16], "=");
-	
+	while (env[i] != NULL)
+	{
+		if (strncmp(env[i], "PATH", 4) == 0)
+		{
+			token = strtok(env[i], "=");
+			break;
+		}
+		i++;
+	}
+
 	while (token != NULL)
 	{
 		token = strtok(NULL, ":");
-		if (token != NULL)
+		if (token != NULL && strcmp(token, "PATH") != 0)
 			add_node(&head, token);
 	}
+
 	return (head);
 }
 
@@ -59,13 +68,14 @@ char *search_path(path_llist **head, char *arg)
 		while ((entry = readdir(dir)) != NULL)
 		{
 			if (strcmp(entry->d_name, arg) == 0)
-			return(validate_access(&curr, arg));
+				return (validate_access(&curr, arg));
 		}
 		closedir(dir);
 		if (curr->next == NULL)
 			break;
 		curr  = curr->next;
 	}
+
 	return(arg);
 }
 

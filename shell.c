@@ -15,7 +15,7 @@ void print_error(void)
 
 void print_prompt(void)
 {
-	write(STDOUT_FILENO, "#cisfun$ ", 10);
+	write(STDOUT_FILENO, "#cisfun$ ", 9);
 }
 
 /**
@@ -34,6 +34,8 @@ int handle_args(char **iptr, char **argv)
 	int i = 0;
 
 	token = strtok(*iptr, " ");
+	if (token == NULL)
+		return (-1);
 	while (token != NULL)
 	{
 		argv[i] = token;
@@ -95,7 +97,7 @@ int execute_command(char *command, char **argv, char **envp)
 
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
-	char *line = {NULL}, *path;
+	char *line = {NULL}, *path = NULL;
 	size_t size = 0;
 	ssize_t linelen;
 	path_llist *head;
@@ -111,22 +113,21 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 				break;
 			print_error();
 		}
-		line[strlen(line) - 1] = '\0';
+		line[linelen - 1] = '\0';
 		if (strcmp(line, "exit") == 0)
 			break;
-		handle_args(&line, argv);
-		path = search_path(&head, argv[0]);
-
-		if ((execute_command(path, argv, envp)) == -1)
+		if (handle_args(&line, argv) != -1)
 		{
-			print_error();
-			free(line);
-			exit(EXIT_FAILURE);
+			path = search_path(&head, argv[0]);
+			if ((execute_command(path, argv, envp)) == -1)
+			{
+				print_error();
+				free(line);
+				exit(EXIT_FAILURE);
+			}
 		}
 	}
 
-	free(head);
-	free(path);
 	free(line);
 	return (0);
 }
