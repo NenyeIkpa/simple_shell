@@ -115,14 +115,16 @@ char *search_path(path_llist **head, char *arg)
 }
 
 /**
- * validate_access -
+ * validate_access - validates if user has
+ * the rights of a user to execute a command
  *
- * @path:
- * @arg:
+ * @path: directory returned from function "search_path" to be validated
+ * @arg: the command passed by the user
  *
- * Description:
+ * Description: validates if a user has the access rights to execute
+ * a command
  *
- * Return:
+ * Return: the complete execution path
  */
 
 char *validate_access(path_llist **path, char *arg)
@@ -131,7 +133,8 @@ char *validate_access(path_llist **path, char *arg)
 	int res;
 	char *full_path;
 
-	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) && (dstat.st_mode & S_IXUSR);
+	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode)
+		&& (dstat.st_mode & S_IXUSR);
 	if (res == -1)
 		return (NULL);
 	full_path = concatenate((*path)->dir, "/", arg);
