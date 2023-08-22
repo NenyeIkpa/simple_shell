@@ -78,14 +78,15 @@ path_llist *token_to_list(char **env)
 }
 
 /**
- * search_path -
+ * search_path - searches through the PATH.
  *
- * @head:
- * @arg:
+ * @head: the head pointer of the linked list
+ * @arg: the argument or command passed by user to be searched
  *
- * Description:
+ * Description: searches through the list of directories in "PATH" of the
+ * environmental variables for the command or argument passed by the user
  *
- * Return:
+ * Return: command or argument passed
  */
 
 char *search_path(path_llist **head, char *arg)
@@ -107,7 +108,7 @@ char *search_path(path_llist **head, char *arg)
 		closedir(dir);
 		if (curr->next == NULL)
 			break;
-		curr  = curr->next;
+		curr = curr->next;
 	}
 
 	return (arg);
