@@ -1,5 +1,17 @@
 #include "shell.h"
 
+/**
+ * add_node - adds node to head position of a linked list.
+ *
+ * @head: the head node
+ * @token: tokenised path saved into each node
+ *
+ * Description: adds a new node to the head of a
+ * struct list with token saved to the new node.
+ *
+ * Return: new head node
+ */
+
 path_llist *add_node(path_llist **head,  const char *token)
 {
 	path_llist *node;
@@ -27,12 +39,23 @@ path_llist *add_node(path_llist **head,  const char *token)
 	return (*head);
 }
 
+/**
+ * token_to_list - tokenisation for the PATH.
+ *
+ * @env: the enviromental variables.
+ *
+ * Description: tokenises the the sub-PATH
+ * directories of the enviromental variables.
+ *
+ * Return: head of the PATH list.
+ */
+
 path_llist *token_to_list(char **env)
 {
 	char *token;
 	path_llist *head;
 	int i = 0;
-       
+
 	head = NULL;
 	while (env[i] != NULL)
 	{
@@ -53,6 +76,17 @@ path_llist *token_to_list(char **env)
 
 	return (head);
 }
+
+/**
+ * search_path -
+ *
+ * @head:
+ * @arg:
+ *
+ * Description:
+ *
+ * Return:
+ */
 
 char *search_path(path_llist **head, char *arg)
 {
@@ -76,8 +110,19 @@ char *search_path(path_llist **head, char *arg)
 		curr  = curr->next;
 	}
 
-	return(arg);
+	return (arg);
 }
+
+/**
+ * validate_access -
+ *
+ * @path:
+ * @arg:
+ *
+ * Description:
+ *
+ * Return:
+ */
 
 char *validate_access(path_llist **path, char *arg)
 {
@@ -92,13 +137,26 @@ char *validate_access(path_llist **path, char *arg)
 	return (full_path);
 }
 
+/**
+ * cocatenate - concatenates strings
+ *
+ * @: s1
+ * @: s2
+ * @: s3
+ *
+ * Description:
+ *
+ * Return:
+ */
+
 char *concatenate(char *s1, char *s2, char *s3)
 {
-  int size = strlen(s1) + strlen(s2) + strlen(s3) + 1;
-  char *str = malloc(size);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3); 
+	int size = strlen(s1) + strlen(s2) + strlen(s3) + 1;
+	char *str = malloc(size);
 
-  return str;
+	strcpy(str, s1);
+	strcat(str, s2);
+	strcat(str, s3);
+
+	return (str);
 }
