@@ -138,15 +138,15 @@ char *validate_access(path_llist **path, char *arg)
 }
 
 /**
- * cocatenate - concatenates strings
+ * concatenate - concatenates 3 strings
  *
- * @: s1
- * @: s2
- * @: s3
+ * @s1: 1st string to be concatenated
+ * @s2: 2nd string to be concatenated
+ * @s3: 3rd string to be concatenated
  *
- * Description:
+ * Description: concatenates 3 strings into 1 string.
  *
- * Return:
+ * Return: the concatenated string
  */
 
 char *concatenate(char *s1, char *s2, char *s3)
