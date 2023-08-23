@@ -32,7 +32,7 @@ path_llist *token_to_list(char **env)
 	char *token;
 	path_llist *head;
 	int i = 0;
-       
+
 	head = NULL;
 	while (env[i] != NULL)
 	{
@@ -76,7 +76,7 @@ char *search_path(path_llist **head, char *arg)
 		curr  = curr->next;
 	}
 
-	return(arg);
+	return (arg);
 }
 
 char *validate_access(path_llist **path, char *arg)
@@ -85,7 +85,8 @@ char *validate_access(path_llist **path, char *arg)
 	int res;
 	char *full_path;
 
-	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) && (dstat.st_mode & S_IXUSR);
+	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) &&
+		(dstat.st_mode & S_IXUSR);
 	if (res == -1)
 		return (NULL);
 	full_path = concatenate((*path)->dir, "/", arg);
@@ -94,11 +95,12 @@ char *validate_access(path_llist **path, char *arg)
 
 char *concatenate(char *s1, char *s2, char *s3)
 {
-  int size = strlen(s1) + strlen(s2) + strlen(s3) + 1;
-  char *str = malloc(size);
-  strcpy (str, s1);
-  strcat (str, s2);
-  strcat (str, s3); 
+	int size = strlen(s1) + strlen(s2) + strlen(s3) + 1;
+	char *str = malloc(size);
 
-  return str;
+	strcpy(str, s1);
+	strcat(str, s2);
+	strcat(str, s3);
+
+	return (str);
 }

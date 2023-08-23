@@ -1,21 +1,33 @@
 #include "shell.h"
 
+void print_error_B(void);
+	char *prgm_name;
+	char *arg;
+void print_error(void);
+
 /**
- * print_error - prints error message
+ * print_error_B - prints error in non-interactive mode
+ */
+
+void print_error_B(void)
+{
+	write(STDERR_FILENO, prgm_name, strlen(prgm_name));
+	write(STDERR_FILENO, ": 1: ", 5);
+	write(STDERR_FILENO, arg, strlen(arg));
+	write(STDERR_FILENO, ": not found\n", 12);
+}
+
+/**
+ * print_error - prints error messages
+ *
  */
 
 void print_error(void)
 {
-	perror("./shell");
-}
-
-/**
- * print_prompt - display's user command prompt
- */
-
-void print_prompt(void)
-{
-	write(STDOUT_FILENO, "#cisfun$ ", 9);
+	if (isatty(STDIN_FILENO))
+		print_error_A();
+	else
+		print_error_B();
 }
 
 /**
@@ -103,9 +115,11 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 	path_llist *head;
 
 	head = token_to_list(envp);
+	prgm_name = argv[0];
 	while (1)
 	{
-		print_prompt();
+		if (isatty(STDIN_FILENO))
+			print_prompt();
 		linelen = getline(&line, &size, stdin);
 		if (linelen == -1)
 		{
@@ -118,6 +132,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			break;
 		if (handle_args(&line, argv) != -1)
 		{
+			arg = argv[0];
 			path = search_path(&head, argv[0]);
 			if ((execute_command(path, argv, envp)) == -1)
 			{
