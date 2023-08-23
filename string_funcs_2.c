@@ -35,7 +35,7 @@ char *_strdup(char *str)
 
 char *_strtok(char *s, const char *delim)
 {
-	static char *last_token = NULL;
+	static char *last_token;
 	char *token, *delimiter;
 
 	if (s != NULL)
