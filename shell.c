@@ -71,8 +71,6 @@ int execute_command(char *command, char **argv, char **envp)
 		waitpid(pid, &status, 0);
 	else if (pid <  0)
 		return (-1);
-	else
-		print_error();
 	return (0);
 }
 
@@ -133,7 +131,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			}
 			if (path != argv[0])
 				free(full_path);
-		}	
+		}
 	}
 	if (head != NULL)
 		delete_list(head);
