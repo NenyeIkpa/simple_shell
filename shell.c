@@ -62,15 +62,22 @@ int execute_command(char *command, char **argv, char **envp)
 	int status;
 
 	pid = fork();
-	if (pid == 0)
+	if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			return (WEXITSTATUS(status));
+	}
+	else if (pid == 0)
 	{
 		if (execve(command, argv, envp) == -1)
 			return (-1);
 	}
-	else if (pid > 0)
-		waitpid(pid, &status, 0);
-	else if (pid <  0)
-		return (-1);
+	else
+	{
+		print_error();
+		exit(127);
+	}
 	return (0);
 }
 
