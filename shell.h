@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
@@ -41,9 +41,7 @@ int _strncmp(char *, char *, size_t);
 char *_strcpy(char *, char *);
 char *_strcat(char *, char *);
 char *_strdup(char *);
-char *_strchr(char *, int);
-char *_strtok(char *, char *);
+char *_strtok(char *, const char *);
 void delete_list(path_llist *);
-char  *getinput(char **line, size_t *size);
 
 #endif
