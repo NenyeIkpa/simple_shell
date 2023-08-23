@@ -132,12 +132,16 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			if ((execute_command(path, argv, envp)) == -1)
 			{
 				print_error();
+				if (head != NULL)
+					delete_list(head);
 				free(line);
 				exit(EXIT_FAILURE);
 			}
 		}
 	}
 
+	if (head != NULL)
+		delete_list(head);
 	free(line);
 	return (0);
 }
