@@ -1,5 +1,7 @@
 #include "shell.h"
 
+int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
+
 /**
  * print_error_B - prints error in non-interactive mode
  */
@@ -10,19 +12,6 @@ void print_error_B(void)
 	write(STDERR_FILENO, ": 1: ", 5);
 	write(STDERR_FILENO, arg, strlen(arg));
 	write(STDERR_FILENO, ": not found\n", 12);
-}
-
-/**
- * print_error - prints error messages
- *
- */
-
-void print_error(void)
-{
-	if (isatty(STDIN_FILENO))
-		print_error_A();
-	else
-		print_error_B();
 }
 
 /**
@@ -104,9 +93,9 @@ int execute_command(char *command, char **argv, char **envp)
 
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
-	char *line = {NULL}, *path = NULL;
+	char *line = {NULL}, *path = NULL, *full_path;
 	size_t size = 0;
-	ssize_t linelen;
+	ssize_t linelen = 0;
 	path_llist *head;
 
 	head = token_to_list(envp);
@@ -129,17 +118,19 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		{
 			arg = argv[0];
 			path = search_path(&head, argv[0]);
-			if ((execute_command(path, argv, envp)) == -1)
+			full_path = concatenate(path, "/", argv[0]);
+			if ((execute_command(full_path, argv, envp)) == -1)
 			{
 				print_error();
 				if (head != NULL)
 					delete_list(head);
+				free(full_path);
 				free(line);
 				exit(EXIT_FAILURE);
 			}
-		}
+			free(full_path);
+		}	
 	}
-
 	if (head != NULL)
 		delete_list(head);
 	free(line);

@@ -105,7 +105,7 @@ char *search_path(path_llist **head, char *arg)
 			if (_strcmp(entry->d_name, arg) == 0)
 			{
 				closedir(dir);
-				return (validate_access(&curr, arg));
+				return (validate_access(&curr));
 			}
 		}
 		closedir(dir);
@@ -122,7 +122,6 @@ char *search_path(path_llist **head, char *arg)
  * the rights of a user to execute a command
  *
  * @path: directory returned from function "search_path" to be validated
- * @arg: the command passed by the user
  *
  * Description: validates if a user has the access rights to execute
  * a command
@@ -130,19 +129,17 @@ char *search_path(path_llist **head, char *arg)
  * Return: the complete execution path
  */
 
-char *validate_access(path_llist **path, char *arg)
+char *validate_access(path_llist **path)
 {
 	struct stat dstat;
 	int res;
-	char *full_path;
 
 	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) &&
 		(dstat.st_mode & S_IXUSR);
 
 	if (res == -1)
 		return (NULL);
-	full_path = concatenate((*path)->dir, "/", arg);
-	return (full_path);
+	return ((*path)->dir);
 }
 
 /**
@@ -160,10 +157,14 @@ char *validate_access(path_llist **path, char *arg)
 char *concatenate(char *s1, char *s2, char *s3)
 {
 	int size = _strlen(s1) + _strlen(s2) + _strlen(s3) + 1;
-	char *str = malloc(size);
+	char *str;
 
+	str = malloc(size);
+	if (str == NULL)
+		return (NULL);
 	_strcpy(str, s1);
 	_strcat(str, s2);
 	_strcat(str, s3);
+
 	return (str);
 }

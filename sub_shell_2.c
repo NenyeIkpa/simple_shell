@@ -38,3 +38,16 @@ void delete_list(path_llist *head)
 	}
 	free(head);
 }
+
+/**
+ * print_error - prints error messages
+ *
+ */
+
+void print_error(void)
+{
+	if (isatty(STDIN_FILENO))
+		print_error_A();
+	else
+		print_error_B();
+}
