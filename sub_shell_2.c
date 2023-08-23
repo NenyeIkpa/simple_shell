@@ -1,12 +1,12 @@
 #include "shell.h"
 
-
 /**
  * print_prompt - display's user command prompt
  */
+
 void print_prompt(void)
 {
-        write(STDOUT_FILENO, "#cisfun$ ", 9);
+	write(STDOUT_FILENO, "#cisfun$ ", 9);
 }
 
 
@@ -16,9 +16,5 @@ void print_prompt(void)
 
 void print_error_A(void)
 {
-        perror("./hsh");
+	perror("./hsh");
 }
-
-/**
- * print_error_B - prints error in non-interactive mode
- */
