@@ -29,10 +29,19 @@ char *arg;
 void print_prompt(void);
 void print_error(void);
 void print_error_A(void);
-path_llist *add_node(path_llist **head, const char *token);
+path_llist *add_node(path_llist **head, char *token);
 path_llist *token_to_list(char **env);
 char *search_path(path_llist **head, char *arg);
 char *validate_access(path_llist **path, char *arg);
 char *concatenate(char *a, char *b, char *c);
+int _strlen(char *);
+int _strcmp(char *, char *);
+int _strncmp(char *, char *, size_t);
+char *_strcpy(char *, char *);
+char *_strcat(char *, char *);
+char *_strdup(char *);
+char *_strchr(char *, int);
+char *_strtok(char *, char *);
+void delete_list(path_llist *);
 
 #endif

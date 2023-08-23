@@ -18,3 +18,23 @@ void print_error_A(void)
 {
 	perror(prgm_name);
 }
+
+/**
+ * delete_list - deletes a linked list
+ *
+ * @head: head ptr to list
+ */
+
+void delete_list(path_llist *head)
+{
+	path_llist *temp;
+
+	while (head != NULL)
+	{
+		temp = head;
+		head = head->next;
+		free(temp->dir);
+		free(temp);
+	}
+	free(head);
+}
