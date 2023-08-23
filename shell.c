@@ -124,7 +124,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		}
 		line[linelen - 1] = '\0';
 		if (_strcmp(line, "exit") == 0)
-			exit(2);
+			break;
 		if (handle_args(&line, argv) != -1)
 		{
 			arg = argv[0];
