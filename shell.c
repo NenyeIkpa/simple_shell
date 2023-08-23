@@ -56,24 +56,23 @@ int handle_args(char **iptr, char **argv)
  * Return: 0 for success -1 for failure
  */
 
-int execute_command(char *command, char **argv, char **envp, int *status)
+int execute_command(char *command, char **argv, char **envp)
 {
 	pid_t pid;
+	int status;
 
 	pid = fork();
-	if (pid > 0)
-	{
-		waitpid(pid, status, 0);
-		if (WIFEXITED(*status))
-			return (WEXITSTATUS(*status));
-	}
-	else if (pid <  0)
-		return (-1);
-	else
+	if (pid == 0)
 	{
 		if (execve(command, argv, envp) == -1)
 			return (-1);
 	}
+	else if (pid > 0)
+		waitpid(pid, &status, 0);
+	else if (pid <  0)
+		return (-1);
+	else
+		print_error();
 	return (0);
 }
 
@@ -99,7 +98,6 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 	size_t size = 0;
 	ssize_t linelen = 0;
 	path_llist *head;
-	int status;
 
 	head = token_to_list(envp);
 	prgm_name = argv[0];
@@ -125,13 +123,13 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 				full_path = concatenate(path, "/", argv[0]);
 			else
 				full_path = path;
-			if ((execute_command(full_path, argv, envp, &status)) == -1)
+			if ((execute_command(full_path, argv, envp)) == -1)
 			{
 				print_error();
-				free(line);
 				if (head != NULL)
 					delete_list(head);
-				exit(status);
+				free(line);
+				exit(127);
 			}
 			if (path != argv[0])
 				free(full_path);
