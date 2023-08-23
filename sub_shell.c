@@ -133,8 +133,9 @@ char *validate_access(path_llist **path, char *arg)
 	int res;
 	char *full_path;
 
-	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode)
-		&& (dstat.st_mode & S_IXUSR);
+	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) &&
+		(dstat.st_mode & S_IXUSR);
+
 	if (res == -1)
 		return (NULL);
 	full_path = concatenate((*path)->dir, "/", arg);
