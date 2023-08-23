@@ -29,14 +29,14 @@ int handle_args(char **iptr, char **argv)
 	char *token;
 	int i = 0;
 
-	token = strtok(*iptr, " ");
+	token = _strtok(*iptr, " ");
 	if (token == NULL)
 		return (-1);
 	while (token != NULL)
 	{
 		argv[i] = token;
 		i++;
-		token = strtok(NULL, " ");
+		token = _strtok(NULL, " ");
 	}
 	argv[i] = NULL;
 	return (0);
@@ -56,22 +56,24 @@ int handle_args(char **iptr, char **argv)
  * Return: 0 for success -1 for failure
  */
 
-int execute_command(char *command, char **argv, char **envp)
+int execute_command(char *command, char **argv, char **envp, int *status)
 {
 	pid_t pid;
-	int status;
 
 	pid = fork();
-	if (pid == 0)
+	if (pid > 0)
+	{
+		waitpid(pid, status, 0);
+		if (WIFEXITED(*status))
+			return (WEXITSTATUS(*status));
+	}
+	else if (pid <  0)
+		return (-1);
+	else
 	{
 		if (execve(command, argv, envp) == -1)
 			return (-1);
 	}
-	else if (pid > 0)
-		waitpid(pid, &status, 0);
-	else
-		print_error();
-
 	return (0);
 }
 
@@ -97,6 +99,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 	size_t size = 0;
 	ssize_t linelen = 0;
 	path_llist *head;
+	int status;
 
 	head = token_to_list(envp);
 	prgm_name = argv[0];
@@ -118,17 +121,20 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		{
 			arg = argv[0];
 			path = search_path(&head, argv[0]);
-			full_path = concatenate(path, "/", argv[0]);
-			if ((execute_command(full_path, argv, envp)) == -1)
+			if (path != argv[0])
+				full_path = concatenate(path, "/", argv[0]);
+			else
+				full_path = path;
+			if ((execute_command(full_path, argv, envp, &status)) == -1)
 			{
 				print_error();
+				free(line);
 				if (head != NULL)
 					delete_list(head);
-				free(full_path);
-				free(line);
-				exit(EXIT_FAILURE);
+				exit(status);
 			}
-			free(full_path);
+			if (path != argv[0])
+				free(full_path);
 		}	
 	}
 	if (head != NULL)
