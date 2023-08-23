@@ -1,7 +1,5 @@
 #include "shell.h"
 
-int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
-
 /**
  * print_error_B - prints error in non-interactive mode
  */
@@ -80,6 +78,19 @@ int execute_command(char *command, char **argv, char **envp)
 	}
 	return (0);
 }
+/**
+ * delete_and_free - just as the name implies
+ *
+ * @head: head pointer to list for deletion
+ * @line: space to be freed
+ *
+ */
+
+void delete_and_free(path_llist *head, char **line)
+{
+	delete_list(head);
+	free(*line);
+}
 
 /**
  * main - gets input from user and executes the command
@@ -100,24 +111,22 @@ int execute_command(char *command, char **argv, char **envp)
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
 	char *line = {NULL}, *path = NULL, *full_path;
-	size_t size = 0;
-	ssize_t linelen = 0;
+	size_t size = 0, linelen = 0;
 	path_llist *head;
 
 	head = token_to_list(envp);
 	prgm_name = argv[0];
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			print_prompt();
+		print_prompt();
 		linelen = getline(&line, &size, stdin);
-		if (linelen == -1)
+		if ((ssize_t)linelen == -1)
 		{
 			if (feof(stdin))
 				break;
 			print_error();
 		}
-		line[linelen - 1] = '\0';
+		line[(ssize_t)linelen - 1] = '\0';
 		if (_strcmp(line, "exit") == 0)
 			break;
 		if (handle_args(&line, argv) != -1)
@@ -131,17 +140,13 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			if ((execute_command(full_path, argv, envp)) == -1)
 			{
 				print_error();
-				if (head != NULL)
-					delete_list(head);
-				free(line);
+				delete_and_free(head, &line);
 				exit(127);
 			}
 			if (path != argv[0])
 				free(full_path);
 		}
 	}
-	if (head != NULL)
-		delete_list(head);
-	free(line);
+	delete_and_free(head, &line);
 	return (0);
 }
