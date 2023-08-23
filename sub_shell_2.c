@@ -16,5 +16,5 @@ void print_prompt(void)
 
 void print_error_A(void)
 {
-	perror("./hsh");
+	perror(prgm_name);
 }

@@ -1,10 +1,5 @@
 #include "shell.h"
 
-void print_error_B(void);
-	char *prgm_name;
-	char *arg;
-void print_error(void);
-
 /**
  * print_error_B - prints error in non-interactive mode
  */
