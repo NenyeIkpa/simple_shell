@@ -24,6 +24,8 @@ typedef struct llist
 } path_llist;
 
 int handle_args(char **iptr, char **argv);
+char *prgm_name;
+char *arg;
 void print_prompt(void);
 void print_error(void);
 void print_error_A(void);
