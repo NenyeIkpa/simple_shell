@@ -6,9 +6,9 @@
 
 void print_error_B(void)
 {
-	write(STDERR_FILENO, prgm_name, strlen(prgm_name));
+	write(STDERR_FILENO, prgm_name, _strlen(prgm_name));
 	write(STDERR_FILENO, ": 1: ", 5);
-	write(STDERR_FILENO, arg, strlen(arg));
+	write(STDERR_FILENO, arg, _strlen(arg));
 	write(STDERR_FILENO, ": not found\n", 12);
 }
 
@@ -123,7 +123,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			print_error();
 		}
 		line[linelen - 1] = '\0';
-		if (strcmp(line, "exit") == 0)
+		if (_strcmp(line, "exit") == 0)
 			break;
 		if (handle_args(&line, argv) != -1)
 		{
