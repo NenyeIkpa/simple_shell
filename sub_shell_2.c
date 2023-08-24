@@ -42,7 +42,6 @@ void delete_list(path_llist *head)
 
 /**
  * print_error - prints error messages
- *
  */
 
 void print_error(void)
