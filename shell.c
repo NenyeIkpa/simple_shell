@@ -129,7 +129,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 				exit(EXIT_FAILURE);
 			}
 			free(full_path);
-		}	
+		}
 	}
 	if (head != NULL)
 		delete_list(head);
