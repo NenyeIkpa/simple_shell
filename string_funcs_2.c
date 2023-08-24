@@ -42,6 +42,7 @@ char *_strtok(char *s, const char *delim)
 		last_token = s;
 	if (last_token == NULL)
 		return (NULL);
+
 	token = last_token;
 	while (*last_token != '\0')
 	{
