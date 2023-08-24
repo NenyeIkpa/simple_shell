@@ -29,14 +29,14 @@ int handle_args(char **iptr, char **argv)
 	char *token;
 	int i = 0;
 
-	token = strtok(*iptr, " ");
+	token = _strtok(*iptr, " ");
 	if (token == NULL)
 		return (-1);
 	while (token != NULL)
 	{
 		argv[i] = token;
 		i++;
-		token = strtok(NULL, " ");
+		token = _strtok(NULL, " ");
 	}
 	argv[i] = NULL;
 	return (0);
@@ -93,7 +93,7 @@ int execute_command(char *command, char **argv, char **envp)
 
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
-	char *line = {NULL}, *path = NULL, *full_path;
+	char *line = {NULL}, *path = NULL;
 	size_t size = 0;
 	ssize_t linelen = 0;
 	path_llist *head;
@@ -118,17 +118,16 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		{
 			arg = argv[0];
 			path = search_path(&head, argv[0]);
-			full_path = concatenate(path, "/", argv[0]);
-			if ((execute_command(full_path, argv, envp)) == -1)
+			if ((execute_command(path, argv, envp)) == -1)
 			{
 				print_error();
 				if (head != NULL)
 					delete_list(head);
-				free(full_path);
 				free(line);
 				exit(EXIT_FAILURE);
 			}
-			free(full_path);
+			if (path != argv[0])
+				free(path);
 		}
 	}
 	if (head != NULL)

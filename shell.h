@@ -34,7 +34,7 @@ void print_error_B(void);
 path_llist *add_node(path_llist **head, char *token);
 path_llist *token_to_list(char **env);
 char *search_path(path_llist **head, char *arg);
-char *validate_access(path_llist **path);
+char *validate_access(path_llist **path, char *arg);
 char *concatenate(char *a, char *b, char *c);
 int _strlen(char *);
 int _strcmp(char *, char *);
