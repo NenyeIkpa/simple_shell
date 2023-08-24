@@ -1,14 +1,16 @@
 #include "shell.h"
 
+int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
+
 /**
  * print_error_B - prints error in non-interactive mode
  */
 
 void print_error_B(void)
 {
-	write(STDERR_FILENO, prgm_name, _strlen(prgm_name));
+	write(STDERR_FILENO, prgm_name, strlen(prgm_name));
 	write(STDERR_FILENO, ": 1: ", 5);
-	write(STDERR_FILENO, arg, _strlen(arg));
+	write(STDERR_FILENO, arg, strlen(arg));
 	write(STDERR_FILENO, ": not found\n", 12);
 }
 
@@ -27,14 +29,14 @@ int handle_args(char **iptr, char **argv)
 	char *token;
 	int i = 0;
 
-	token = _strtok(*iptr, " ");
+	token = strtok(*iptr, " ");
 	if (token == NULL)
 		return (-1);
 	while (token != NULL)
 	{
 		argv[i] = token;
 		i++;
-		token = _strtok(NULL, " ");
+		token = strtok(NULL, " ");
 	}
 	argv[i] = NULL;
 	return (0);
@@ -60,36 +62,17 @@ int execute_command(char *command, char **argv, char **envp)
 	int status;
 
 	pid = fork();
-	if (pid > 0)
-	{
-		waitpid(pid, &status, 0);
-		if (WIFEXITED(status))
-			return (WEXITSTATUS(status));
-	}
-	else if (pid == 0)
+	if (pid == 0)
 	{
 		if (execve(command, argv, envp) == -1)
 			return (-1);
 	}
+	else if (pid > 0)
+		waitpid(pid, &status, 0);
 	else
-	{
 		print_error();
-		exit(127);
-	}
-	return (0);
-}
-/**
- * delete_and_free - just as the name implies
- *
- * @head: head pointer to list for deletion
- * @line: space to be freed
- *
- */
 
-void delete_and_free(path_llist *head, char **line)
-{
-	delete_list(head);
-	free(*line);
+	return (0);
 }
 
 /**
@@ -111,42 +94,45 @@ void delete_and_free(path_llist *head, char **line)
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
 	char *line = {NULL}, *path = NULL, *full_path;
-	size_t size = 0, linelen = 0;
+	size_t size = 0;
+	ssize_t linelen = 0;
 	path_llist *head;
 
 	head = token_to_list(envp);
 	prgm_name = argv[0];
 	while (1)
 	{
-		print_prompt();
+		if (isatty(STDIN_FILENO))
+			print_prompt();
 		linelen = getline(&line, &size, stdin);
-		if ((ssize_t)linelen == -1)
+		if (linelen == -1)
 		{
 			if (feof(stdin))
 				break;
 			print_error();
 		}
-		line[(ssize_t)linelen - 1] = '\0';
-		if (_strcmp(line, "exit") == 0)
+		line[linelen - 1] = '\0';
+		if (strcmp(line, "exit") == 0)
 			break;
 		if (handle_args(&line, argv) != -1)
 		{
 			arg = argv[0];
 			path = search_path(&head, argv[0]);
-			if (path != argv[0])
-				full_path = concatenate(path, "/", argv[0]);
-			else
-				full_path = path;
+			full_path = concatenate(path, "/", argv[0]);
 			if ((execute_command(full_path, argv, envp)) == -1)
 			{
 				print_error();
-				delete_and_free(head, &line);
-				exit(127);
-			}
-			if (path != argv[0])
+				if (head != NULL)
+					delete_list(head);
 				free(full_path);
-		}
+				free(line);
+				exit(EXIT_FAILURE);
+			}
+			free(full_path);
+		}	
 	}
-	delete_and_free(head, &line);
+	if (head != NULL)
+		delete_list(head);
+	free(line);
 	return (0);
 }
