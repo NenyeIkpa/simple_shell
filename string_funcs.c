@@ -99,6 +99,7 @@ char *_strcat(char *s1, char *s2)
 	dest_len = _strlen(s1);
 	for (i = 0; s2[i] != '\0'; i++)
 		s1[dest_len + i]  = s2[i];
+
 	s1[dest_len + i] = '\0';
 	return (s1);
 }
