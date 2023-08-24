@@ -61,7 +61,7 @@ path_llist *token_to_list(char **env)
 	{
 		if (_strncmp(env[i], "PATH", 4) == 0)
 		{
-			token = strtok(env[i], "=, :");
+			token = _strtok(env[i], "=, :");
 			break;
 		}
 		i++;
@@ -69,7 +69,7 @@ path_llist *token_to_list(char **env)
 
 	while (token != NULL)
 	{
-		token = strtok(NULL, "=, :");
+		token = _strtok(NULL, "=, :");
 		if (token != NULL && _strcmp(token, "PATH") != 0)
 			add_node(&head, token);
 	}
@@ -105,7 +105,7 @@ char *search_path(path_llist **head, char *arg)
 			if (_strcmp(entry->d_name, arg) == 0)
 			{
 				closedir(dir);
-				return (validate_access(&curr));
+				return (validate_access(&curr, arg));
 			}
 		}
 		closedir(dir);
@@ -122,6 +122,7 @@ char *search_path(path_llist **head, char *arg)
  * the rights of a user to execute a command
  *
  * @path: directory returned from function "search_path" to be validated
+ * @arg: user input
  *
  * Description: validates if a user has the access rights to execute
  * a command
@@ -129,17 +130,19 @@ char *search_path(path_llist **head, char *arg)
  * Return: the complete execution path
  */
 
-char *validate_access(path_llist **path)
+char *validate_access(path_llist **path, char *arg)
 {
 	struct stat dstat;
 	int res;
+	char *full_path;
 
 	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) &&
 		(dstat.st_mode & S_IXUSR);
 
 	if (res == -1)
 		return (NULL);
-	return ((*path)->dir);
+	full_path = concatenate((*path)->dir, "/", arg);
+	return (full_path);
 }
 
 /**
