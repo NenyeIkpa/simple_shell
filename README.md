@@ -4,6 +4,7 @@ ________________________________________________________________________________
 ## A simple shell project in C programming language
 
 This is a simple shell program that can be compiled, executed and launched from the command line.
+The command and syntax are similar to running a command in any other shell.
 
 ### List of allowed functions and system calls in this project
 access (man 2 access)
