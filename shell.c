@@ -30,6 +30,7 @@ int handle_args(char **iptr, char **argv)
 	int i = 0;
 
 	token = _strtok(*iptr, " ");
+
 	if (token == NULL)
 		return (-1);
 	while (token != NULL)
