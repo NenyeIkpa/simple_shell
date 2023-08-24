@@ -61,7 +61,7 @@ path_llist *token_to_list(char **env)
 	{
 		if (_strncmp(env[i], "PATH", 4) == 0)
 		{
-			token = _strtok(env[i], "=, :");
+			token = strtok(env[i], "=, :");
 			break;
 		}
 		i++;
@@ -69,7 +69,7 @@ path_llist *token_to_list(char **env)
 
 	while (token != NULL)
 	{
-		token = _strtok(NULL, "=, :");
+		token = strtok(NULL, "=, :");
 		if (token != NULL && _strcmp(token, "PATH") != 0)
 			add_node(&head, token);
 	}
