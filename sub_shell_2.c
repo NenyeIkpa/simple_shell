@@ -29,3 +29,29 @@ void delete_list(path_llist *head)
 	}
 	free(head);
 }
+
+
+/**
+ * handle_comments - checks if the string is a comment
+ *
+ * @input: string to be checked. fix a null byte at point of #
+ */
+
+void handle_comments(char *input)
+{
+	int i = 0;
+
+	while (input[i])
+	{
+		if (i > 0 && input[i] == '#' && input[i - 1] != ' ')
+			break;
+
+		if (input[i] == '#')
+		{
+			input[i] = '\0';
+			break;
+		}
+
+		i++;
+	}
+}

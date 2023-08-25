@@ -98,7 +98,7 @@ void _puts(char *s)
 }
 
 /**
- * _putchar: writes a char to stdout
+ * _putchar - writes a char to stdout
  *
  * @c: given char
  */
@@ -107,3 +107,4 @@ void _putchar(char c)
 {
 	write(STDOUT_FILENO, &c, sizeof(char));
 }
+
