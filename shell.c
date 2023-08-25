@@ -134,6 +134,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		line[_strlen(line) - 1] = '\0';
 		if (strcmp(line, "exit") == 0)
 			break;
+		handle_comments(line);
 		handle_args(&line, argv);
 		if (argv[0] == NULL)
 		{

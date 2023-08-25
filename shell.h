@@ -49,6 +49,8 @@ void delete_list(path_llist *);
 void _putc(char c);
 void _puts(char *s);
 void _putchar(char c);
+void _putstring(char *s);
+void handle_comments(char *input);
 char *_realloc(char *buffer, size_t count);
 
 #endif
