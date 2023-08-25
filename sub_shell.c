@@ -23,6 +23,7 @@ path_llist *add_node(path_llist **head, char *token)
 	if (node == NULL)
 		return (NULL);
 	token_copy = _strdup(token);
+
 	if (*head == NULL)
 	{
 		*head = node;
