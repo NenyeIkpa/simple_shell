@@ -19,16 +19,24 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
 int execute_command(char *command, char **argv, char **envp)
 {
 	pid_t pid;
-	int status;
+	int status, exit_status;
 
 	pid = fork();
 	if (pid == 0)
 	{
 		execve(command, argv, envp);
-			return (-1);
+		{
+			print_error();
+			exit(2);
+		}
 	}
 	else if (pid > 0)
+	{
 		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			exit_status = WEXITSTATUS(status);
+		errno = exit_status;
+	}
 	else
 		return (-1);
 
@@ -73,6 +81,7 @@ char *get_input(void)
 	char *input = NULL;
 	size_t size = 0;
 	ssize_t inputlen = 0;
+	int interactive = isatty(STDIN_FILENO);
 
 	inputlen = getline(&input, &size, stdin);
 	if (inputlen == -1)
@@ -81,11 +90,13 @@ char *get_input(void)
 		if (feof(stdin))
 		{
 			free(input);
+			if (interactive)
+				_putchar('\n');
 			return (NULL);
 		}
 		free(input);
 		print_error();
-		exit(EXIT_FAILURE);
+		exit(errno);
 	}
 	return (input);
 }
@@ -111,12 +122,16 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
 	char *line, *path = NULL;
 	path_llist *head;
+	int count = 0, interactive;
+	errno = 0;
 
 	head = token_to_list(envp);
 	prgm_name = argv[0];
+	interactive = isatty(STDIN_FILENO);
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
+		count++;
+		if (interactive)
 			print_prompt();
 		line = get_input();
 		if (line == NULL)
@@ -136,14 +151,17 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 			path = search_path(&head, argv[0]);
 			if (path == NULL)
 			{
+				cmd_count  = count + '0';
 				print_error();
 				free(line);
+				if (!interactive)
+					exit(127);
 				continue;
 			}
 		}
 		else
 			path = argv[0];
-		if ((execute_command(path, argv, envp)) == -1)
+		if (execute_command(path, argv, envp) == -1)
 		{
 			print_error();
 			if (head != NULL)

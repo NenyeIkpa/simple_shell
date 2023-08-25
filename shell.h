@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <errno.h>
 
 /**
  * struct llist - linked list structure
@@ -27,6 +28,7 @@ typedef struct llist
 void handle_args(char **iptr, char **argv);
 char *prgm_name;
 char *arg;
+char cmd_count;
 void print_prompt(void);
 void print_error(void);
 void print_error_A(void);
@@ -46,6 +48,7 @@ char *_strtok(char *, const char *);
 void delete_list(path_llist *);
 void _putc(char c);
 void _puts(char *s);
+void _putchar(char c);
 char *_realloc(char *buffer, size_t count);
 
 #endif
