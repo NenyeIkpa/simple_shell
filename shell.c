@@ -3,47 +3,6 @@
 int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
 
 /**
- * print_error_B - prints error in non-interactive mode
- */
-
-void print_error_B(void)
-{
-	write(STDERR_FILENO, prgm_name, strlen(prgm_name));
-	write(STDERR_FILENO, ": 1: ", 5);
-	write(STDERR_FILENO, arg, strlen(arg));
-	write(STDERR_FILENO, ": not found\n", 12);
-}
-
-/**
- * handle_args - tokenizes command line arguments and
- * sets them in argv
- *
- * @iptr: pointer to user input
- * @argv: list of argument variables
- *
- * Return: int
- */
-
-int handle_args(char **iptr, char **argv)
-{
-	char *token;
-	int i = 0;
-
-	token = _strtok(*iptr, " ");
-
-	if (token == NULL)
-		return (-1);
-	while (token != NULL)
-	{
-		argv[i] = token;
-		i++;
-		token = _strtok(NULL, " ");
-	}
-	argv[i] = NULL;
-	return (0);
-}
-
-/**
  * execute_command - executes command
  *
  * @command: input from stdin
@@ -65,15 +24,70 @@ int execute_command(char *command, char **argv, char **envp)
 	pid = fork();
 	if (pid == 0)
 	{
-		if (execve(command, argv, envp) == -1)
+		execve(command, argv, envp);
 			return (-1);
 	}
 	else if (pid > 0)
 		waitpid(pid, &status, 0);
 	else
-		print_error();
+		return (-1);
 
 	return (0);
+}
+
+/**
+ * handle_args - tokenizes command line arguments and
+ * sets them in argv
+ *
+ * @iptr: pointer to user input
+ * @argv: list of argument variables
+ *
+ * Return: int
+ */
+
+void handle_args(char **iptr, char **argv)
+{
+	char *token = NULL;
+	int i = 0;
+
+	token = _strtok(*iptr, " ");
+
+	while (token != NULL)
+	{
+		if (_strcmp(token, "") != 0)
+			argv[i] = token;
+		i++;
+		token = _strtok(NULL, " ");
+	}
+	argv[i] = NULL;
+}
+
+/**
+ * get_input - gets input from user
+ *
+ * Return: input
+ */
+
+char *get_input(void)
+{
+	char *input = NULL;
+	size_t size = 0;
+	ssize_t inputlen = 0;
+
+	inputlen = getline(&input, &size, stdin);
+	if (inputlen == -1)
+	{
+		/** check for Ctrl->D */
+		if (feof(stdin))
+		{
+			free(input);
+			return (NULL);
+		}
+		free(input);
+		print_error();
+		exit(EXIT_FAILURE);
+	}
+	return (input);
 }
 
 /**
@@ -92,11 +106,10 @@ int execute_command(char *command, char **argv, char **envp)
  * Return: success 0, failure -1
  */
 
+
 int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
-	char *line = {NULL}, *path = NULL;
-	size_t size = 0;
-	ssize_t linelen = 0;
+	char *line, *path = NULL;
 	path_llist *head;
 
 	head = token_to_list(envp);
@@ -105,31 +118,42 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 	{
 		if (isatty(STDIN_FILENO))
 			print_prompt();
-		linelen = getline(&line, &size, stdin);
-		if (linelen == -1)
-		{
-			if (feof(stdin))
-				break;
-			print_error();
-		}
-		line[linelen - 1] = '\0';
+		line = get_input();
+		if (line == NULL)
+			break;
+		line[_strlen(line) - 1] = '\0';
 		if (strcmp(line, "exit") == 0)
 			break;
-		if (handle_args(&line, argv) != -1)
+		handle_args(&line, argv);
+		if (argv[0] == NULL)
 		{
-			arg = argv[0];
+			free(line);
+			continue;
+		}
+		arg = argv[0];
+		if (validate_access(argv[0]) == 1)
+		{;
 			path = search_path(&head, argv[0]);
-			if ((execute_command(path, argv, envp)) == -1)
+			if (path == NULL)
 			{
 				print_error();
-				if (head != NULL)
-					delete_list(head);
 				free(line);
-				exit(EXIT_FAILURE);
+				continue;
 			}
-			if (path != argv[0])
-				free(path);
 		}
+		else
+			path = argv[0];
+		if ((execute_command(path, argv, envp)) == -1)
+		{
+			print_error();
+			if (head != NULL)
+				delete_list(head);
+			free(line);
+			exit(EXIT_FAILURE);
+		}
+		if (path != argv[0])
+			free(path);
+	free(line);
 	}
 	if (head != NULL)
 		delete_list(head);
