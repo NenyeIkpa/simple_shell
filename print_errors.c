@@ -16,7 +16,9 @@ void print_error_A(void)
 void print_error_B(void)
 {
 	_puts(prgm_name);
-	_puts(": 1: ");
+	_puts(": ");
+	_putc(cmd_count);
+	_puts(": ");
 	_puts(arg);
 	_puts(": not found\n");
 }
