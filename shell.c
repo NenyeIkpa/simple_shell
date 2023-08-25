@@ -25,7 +25,10 @@ int execute_command(char *command, char **argv, char **envp)
 	if (pid == 0)
 	{
 		execve(command, argv, envp);
-			return (-1);
+		{
+			print_error();
+			exit(2);
+		}
 	}
 	else if (pid > 0)
 	{
@@ -35,7 +38,7 @@ int execute_command(char *command, char **argv, char **envp)
 		errno = exit_status;
 	}
 	else
-		exit(-1);
+		return (-1);
 
 	return (0);
 }
@@ -158,13 +161,13 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		}
 		else
 			path = argv[0];
-		if ((execute_command(path, argv, envp)) == -1)
+		if (execute_command(path, argv, envp) == -1)
 		{
 			print_error();
 			if (head != NULL)
 				delete_list(head);
 			free(line);
-			exit(2);
+			exit(EXIT_FAILURE);
 		}
 		if (path != argv[0])
 			free(path);
