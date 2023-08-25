@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
-#include <errno.h>
 
 /**
  * struct llist - linked list structure
@@ -29,6 +28,7 @@ void handle_args(char **iptr, char **argv);
 char *prgm_name;
 char *arg;
 char cmd_count;
+int err_status;
 void print_prompt(void);
 void print_error(void);
 void print_error_A(void);

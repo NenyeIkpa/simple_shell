@@ -19,28 +19,25 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
 int execute_command(char *command, char **argv, char **envp)
 {
 	pid_t pid;
-	int status, exit_status;
+	int status;
 
 	pid = fork();
-	if (pid == 0)
+	if (pid < 0)
+		err_status = -1;
+	else if (pid == 0)
 	{
 		execve(command, argv, envp);
-		{
-			print_error();
-			exit(2);
-		}
+		print_error();
+		exit(2);
 	}
-	else if (pid > 0)
+	else
 	{
 		waitpid(pid, &status, 0);
 		if (WIFEXITED(status))
-			exit_status = WEXITSTATUS(status);
-		errno = exit_status;
+			err_status = WEXITSTATUS(status);
 	}
-	else
-		return (-1);
 
-	return (0);
+	return (err_status);
 }
 
 /**
@@ -96,7 +93,7 @@ char *get_input(void)
 		}
 		free(input);
 		print_error();
-		exit(errno);
+		exit(EXIT_FAILURE);
 	}
 	return (input);
 }
@@ -122,12 +119,10 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 {
 	char *line, *path = NULL;
 	path_llist *head;
-	int count = 0, interactive;
-	errno = 0;
+	int count = 0, interactive = isatty(STDIN_FILENO);
 
 	head = token_to_list(envp);
 	prgm_name = argv[0];
-	interactive = isatty(STDIN_FILENO);
 	while (1)
 	{
 		count++;
@@ -176,5 +171,5 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 	if (head != NULL)
 		delete_list(head);
 	free(line);
-	return (0);
+	return (err_status);
 }
