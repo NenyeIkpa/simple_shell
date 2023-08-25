@@ -67,3 +67,31 @@ char *_strtok(char *s, const char *delim)
 		return (NULL);
 	return (token);
 }
+
+/**
+ * _putc - prints a char to stderr
+ *
+ * @c: char to be printed
+ */
+
+void _putc(char c)
+{
+	write(STDERR_FILENO, &c, sizeof(c));
+}
+
+/**
+ * _puts - prints a string to stderr
+ *
+ * @s: string to be printed
+ */
+
+void _puts(char *s)
+{
+	int i = 0;
+
+	while (s[i] != '\0')
+	{
+		_putc(s[i]);
+		i++;
+	}
+}

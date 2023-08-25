@@ -24,7 +24,7 @@ typedef struct llist
 	struct llist *next;
 } path_llist;
 
-int handle_args(char **iptr, char **argv);
+void handle_args(char **iptr, char **argv);
 char *prgm_name;
 char *arg;
 void print_prompt(void);
@@ -34,7 +34,7 @@ void print_error_B(void);
 path_llist *add_node(path_llist **head, char *token);
 path_llist *token_to_list(char **env);
 char *search_path(path_llist **head, char *arg);
-char *validate_access(path_llist **path, char *arg);
+int validate_access(char *path);
 char *concatenate(char *a, char *b, char *c);
 int _strlen(char *);
 int _strcmp(char *, char *);
@@ -44,5 +44,8 @@ char *_strcat(char *, char *);
 char *_strdup(char *);
 char *_strtok(char *, const char *);
 void delete_list(path_llist *);
+void _putc(char c);
+void _puts(char *s);
+char *_realloc(char *buffer, size_t count);
 
 #endif

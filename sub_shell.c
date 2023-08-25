@@ -52,7 +52,7 @@ path_llist *add_node(path_llist **head, char *token)
 
 path_llist *token_to_list(char **env)
 {
-	char *token;
+	char *token, *path_dup;
 	path_llist *head;
 	int i = 0;
 
@@ -61,7 +61,8 @@ path_llist *token_to_list(char **env)
 	{
 		if (_strncmp(env[i], "PATH", 4) == 0)
 		{
-			token = _strtok(env[i], "=, :");
+			path_dup = _strdup(env[i]);
+			token = _strtok(path_dup, "=");
 			break;
 		}
 		i++;
@@ -69,11 +70,12 @@ path_llist *token_to_list(char **env)
 
 	while (token != NULL)
 	{
-		token = _strtok(NULL, "=, :");
+		token = _strtok(NULL, ":");
 		if (token != NULL && _strcmp(token, "PATH") != 0)
 			add_node(&head, token);
 	}
 
+	free(path_dup);
 	return (head);
 }
 
@@ -94,6 +96,7 @@ char *search_path(path_llist **head, char *arg)
 	DIR *dir;
 	struct dirent *entry;
 	path_llist *curr;
+	char *full_path = NULL;
 
 	curr = *head;
 	while (curr != NULL)
@@ -105,7 +108,11 @@ char *search_path(path_llist **head, char *arg)
 			if (_strcmp(entry->d_name, arg) == 0)
 			{
 				closedir(dir);
-				return (validate_access(&curr, arg));
+				if (validate_access(curr->dir) == 0)
+				{
+					full_path = concatenate(curr->dir, "/", arg);
+					return (full_path);
+				}
 			}
 		}
 		closedir(dir);
@@ -114,35 +121,30 @@ char *search_path(path_llist **head, char *arg)
 		curr = curr->next;
 	}
 
-	return (arg);
+	return (full_path);
 }
 
 /**
  * validate_access - validates if user has
  * the rights of a user to execute a command
  *
- * @path: directory returned from function "search_path" to be validated
- * @arg: user input
+ * @path: path to be validated
  *
  * Description: validates if a user has the access rights to execute
  * a command
  *
- * Return: the complete execution path
+ * Return: 0 when user has execution rights, otherwise, 1
  */
 
-char *validate_access(path_llist **path, char *arg)
+int validate_access(char *path)
 {
 	struct stat dstat;
 	int res;
-	char *full_path;
 
-	res = stat((*path)->dir, &dstat) && S_ISREG(dstat.st_mode) &&
-		(dstat.st_mode & S_IXUSR);
-
+	res = stat(path, &dstat);
 	if (res == -1)
-		return (NULL);
-	full_path = concatenate((*path)->dir, "/", arg);
-	return (full_path);
+		return (1);
+	return (0);
 }
 
 /**
