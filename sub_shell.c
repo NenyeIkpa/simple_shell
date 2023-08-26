@@ -43,26 +43,24 @@ path_llist *add_node(path_llist **head, char *token)
 /**
  * token_to_list - tokenisation for the PATH.
  *
- * @env: the enviromental variables.
- *
  * Description: tokenises the the sub-PATH
  * directories of the enviromental variables.
  *
  * Return: head of the PATH list.
  */
 
-path_llist *token_to_list(char **env)
+path_llist *token_to_list(void)
 {
 	char *token, *path_dup;
 	path_llist *head;
 	int i = 0;
 
 	head = NULL;
-	while (env[i] != NULL)
+	while (environ[i] != NULL)
 	{
-		if (_strncmp(env[i], "PATH", 4) == 0)
+		if (_strncmp(environ[i], "PATH", 4) == 0)
 		{
-			path_dup = _strdup(env[i]);
+			path_dup = _strdup(environ[i]);
 			token = _strtok(path_dup, "=");
 			break;
 		}
