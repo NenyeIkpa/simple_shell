@@ -30,9 +30,7 @@ int handle_builtins(char **argv, path_llist **head, char *line)
 		else if (argc == 2)
 		{
 			err_status = atoi(argv[1]);
-			delete_list(*head);
-			free(line);
-			exit(err_status);
+			handle_err_status(err_status, head, line, argv);
 		}
 		else
 			return (1);
@@ -63,5 +61,36 @@ int handle_builtins(char **argv, path_llist **head, char *line)
 	}
 	else
 		return (5);
+	return (0);
+}
+
+int handle_err_status(int err_status, path_llist **head, char *line, char **argv)
+{
+	if (err_status < 0)
+	{
+		_puts(prgm_name);
+		_puts(": 1: exit: Illegal number: ");
+		_puts(argv[1]);
+		_puts("\n");
+		delete_list(*head);
+		free(line);
+		exit(2);
+	}
+	else if (argv[1][0] != '0' && atoi(argv[1]) == 0)
+	{
+		_puts(prgm_name);
+		_puts(": 1: exit: Illegal number: ");
+		_puts(argv[1]);
+		_puts("\n");
+		delete_list(*head);
+		free(line);
+		exit(2);
+	}
+	else
+	{
+		delete_list(*head);
+		free(line);
+		exit(err_status);
+	}
 	return (0);
 }
