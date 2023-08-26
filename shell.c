@@ -1,13 +1,12 @@
 #include "shell.h"
 
-int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
+int main(__attribute__((unused))int argc, char *argv[]);
 
 /**
  * execute_command - executes command
  *
  * @command: input from stdin
  * @argv: list of arg variables
- * @envp: list of env variables
  *
  * Description: forks current process. executes command
  * if no running process otherwise waits for completion
@@ -16,7 +15,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[]);
  * Return: 0 for success -1 for failure
  */
 
-int execute_command(char *command, char **argv, char **envp)
+int execute_command(char *command, char **argv)
 {
 	pid_t pid;
 	int status;
@@ -26,7 +25,7 @@ int execute_command(char *command, char **argv, char **envp)
 		err_status = -1;
 	else if (pid == 0)
 	{
-		execve(command, argv, envp);
+		execve(command, argv, environ);
 		print_error();
 		exit(2);
 	}
@@ -103,7 +102,6 @@ char *get_input(void)
  *
  * @argc: arg count
  * @argv: list of arg variables
- * @envp: list of environment variables
  *
  * Description: run an infinte loop for the custom shell's
  * command prompt. get input from user, strip off the new line character
@@ -115,13 +113,13 @@ char *get_input(void)
  */
 
 
-int main(__attribute__((unused))int argc, char *argv[], char *envp[])
+int main(__attribute__((unused))int argc, char *argv[])
 {
 	char *line, *path = NULL;
 	path_llist *head;
-	int count = 0, interactive = isatty(STDIN_FILENO);
+	int count = 0, interactive = isatty(STDIN_FILENO), builtin_mode = 0;
 
-	head = token_to_list(envp);
+	head = token_to_list();
 	prgm_name = argv[0];
 	while (1)
 	{
@@ -132,8 +130,6 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		if (line == NULL)
 			break;
 		line[_strlen(line) - 1] = '\0';
-		if (strcmp(line, "exit") == 0)
-			break;
 		handle_comments(line);
 		handle_args(&line, argv);
 		if (argv[0] == NULL)
@@ -143,7 +139,10 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		}
 		arg = argv[0];
 		if (validate_access(argv[0]) == 1)
-		{;
+		{
+			builtin_mode = handle_builtins(argv, &head, line);
+			if (builtin_mode == 0)
+				continue;
 			path = search_path(&head, argv[0]);
 			if (path == NULL)
 			{
@@ -157,7 +156,7 @@ int main(__attribute__((unused))int argc, char *argv[], char *envp[])
 		}
 		else
 			path = argv[0];
-		if (execute_command(path, argv, envp) == -1)
+		if (execute_command(path, argv) == -1)
 		{
 			print_error();
 			if (head != NULL)
