@@ -51,7 +51,7 @@ path_llist *add_node(path_llist **head, char *token)
 
 path_llist *token_to_list(void)
 {
-	char *token, *path_dup;
+	char *token = NULL, *path_dup = NULL;
 	path_llist *head;
 	int i = 0;
 
