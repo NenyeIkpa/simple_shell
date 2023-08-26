@@ -66,5 +66,6 @@ int _replaceenv(char *envv, char *replacant);
 int _setenv(char *name, char *value, int overwrite);
 char *_itoa(int num, char *str, int base);
 void reverse_str(char *str);
+int handle_err_status(int err_status, path_llist **head, char *line, char **argv);
 
 #endif
