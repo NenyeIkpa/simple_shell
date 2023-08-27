@@ -64,7 +64,19 @@ int handle_builtins(char **argv, path_llist **head, char *line)
 	return (0);
 }
 
-int handle_err_status(int err_status, path_llist **head, char *line, char **argv)
+/**
+ * handle_err_status - handles exit codes
+ *
+ * @err_status: exit code
+ * @head: head pointer to list
+ * @line: given input
+ * @argv: list of args
+ *
+ * Return: int
+ */
+
+int handle_err_status(int err_status, path_llist **head,
+		char *line, char **argv)
 {
 	if (err_status < 0)
 	{

@@ -44,7 +44,6 @@ int _chdir(char **argv)
 		home_dir = getenv("HOME");
 		if (home_dir == NULL)
 		{
-			perror("cd");
 			return (1);
 		}
 		_strcpy(new_dir, (char *)home_dir);
@@ -56,7 +55,6 @@ int _chdir(char **argv)
 			prev_dir = getenv("OLDPWD");
 			if (prev_dir == NULL)
 			{
-				perror("cd");
 				return (1);
 			}
 			_strcpy(new_dir, argv[1]);
@@ -66,27 +64,25 @@ int _chdir(char **argv)
 	}
 	else
 	{
-		perror("cd");
 		return (1);
 	}
 	if (getcwd(old_dir, sizeof(old_dir)) == NULL)
 	{
-		perror("cd");
 		return (1);
 	}
 	if (chdir(new_dir) != 0)
 	{
-		perror("cd");
+		_puts(prgm_name);
+		_puts(": 1: cd: can't cd to");
+		_puts(argv[1]);
 		return (1);
 	}
 	if (setenv("OLDPWD", old_dir, 1) != 0)
 	{
-		perror("cd");
 		return (1);
 	}
 	if (setenv("PWD", new_dir, 1) != 0)
 	{
-		perror("cd");
 		return (1);
 	}
 	return (0);
