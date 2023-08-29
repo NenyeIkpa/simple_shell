@@ -1,6 +1,5 @@
 #include "shell.h"
 
-int _chdir(char **argv);
 int _putenv(char *str);
 
 /**
@@ -33,58 +32,50 @@ void printenv(void)
 
 int _chdir(char **argv)
 {
-	int i = 0;
-	char new_dir[MAX_PATH_LENGTH], old_dir[MAX_PATH_LENGTH];
-	const char *home_dir, *prev_dir;
+	int argc = 0;
+	char current_dir[MAX_PATH_LENGTH];
+	char *home_dir = getenv("HOME");
+	char *previous_dir = NULL, *target_dir = NULL;
 
-	while (argv[i] != NULL)
-		i++;
-	if (i == 1)
+	while (argv[argc] != NULL)
+		argc++;
+	if (argc > 2)
+		return (1);
+	if (argc == 1)
 	{
-		home_dir = getenv("HOME");
 		if (home_dir == NULL)
-		{
 			return (1);
-		}
-		_strcpy(new_dir, (char *)home_dir);
-	}
-	else if (i == 2)
-	{
-		if (_strcmp(argv[1], "-") == 0)
-		{
-			prev_dir = getenv("OLDPWD");
-			if (prev_dir == NULL)
-			{
-				return (1);
-			}
-			_strcpy(new_dir, argv[1]);
-		}
-		else
-			_strcpy(new_dir, argv[1]);
+		if (getcwd(current_dir, sizeof(current_dir)) == NULL)
+			return (1);
+		if (chdir(home_dir) != 0)
+			return (1);
 	}
 	else
 	{
-		return (1);
+		target_dir = argv[1];
+		if (_strcmp(target_dir, "-") == 0)
+		{
+			if (previous_dir == NULL)
+				return (1);
+			target_dir = previous_dir;
+		}
+		if (getcwd(current_dir, sizeof(current_dir)) == NULL)
+			return (1);
+		if (chdir(target_dir) != 0)
+		{
+			_puts(prgm_name);
+			_puts(": 1: cd: can't cd to ");
+			_puts(target_dir);
+			_puts("\n");
+			return (1);
+		}
+		previous_dir = _strdup(current_dir);
 	}
-	if (getcwd(old_dir, sizeof(old_dir)) == NULL)
-	{
+	if (getcwd(current_dir, sizeof(current_dir)) == NULL)
 		return (1);
-	}
-	if (chdir(new_dir) != 0)
-	{
-		_puts(prgm_name);
-		_puts(": 1: cd: can't cd to");
-		_puts(argv[1]);
+	/* Update the PWD environment variable */
+	if (setenv("PWD", current_dir, 1) != 0)
 		return (1);
-	}
-	if (setenv("OLDPWD", old_dir, 1) != 0)
-	{
-		return (1);
-	}
-	if (setenv("PWD", new_dir, 1) != 0)
-	{
-		return (1);
-	}
 	return (0);
 }
 
